@@ -117,10 +117,13 @@ func defaultStoreOptionsIsolated(rootless bool, rootlessUID int, storageConf str
 }
 
 // DefaultStoreOptions returns the default storage ops for containers
-func DefaultStoreOptions(rootless bool, rootlessUID int) (StoreOptions, error) {
-	storageConf, err := DefaultConfigFile(rootless && rootlessUID != 0)
-	if err != nil {
-		return defaultStoreOptions, err
+func DefaultStoreOptions(rootless bool, rootlessUID int, storageConf string) (StoreOptions, error) {
+	var err error
+	if len(storageConf) == 0 {
+		storageConf, err = DefaultConfigFile(rootless && rootlessUID != 0)
+		if err != nil {
+			return defaultStoreOptions, err
+		}
 	}
 	return defaultStoreOptionsIsolated(rootless, rootlessUID, storageConf)
 }
@@ -234,7 +237,7 @@ func getRootlessStorageOpts(rootlessUID int, systemOpts StoreOptions) (StoreOpti
 // DefaultStoreOptionsAutoDetectUID returns the default storage ops for containers
 func DefaultStoreOptionsAutoDetectUID() (StoreOptions, error) {
 	uid := getRootlessUID()
-	return DefaultStoreOptions(uid != 0, uid)
+	return DefaultStoreOptions(uid != 0, uid, "")
 }
 
 var prevReloadConfig = struct {
